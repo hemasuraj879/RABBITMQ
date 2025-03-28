@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  namespace: suraj
+  labels:
+    project: suraj
+    env: dev
+    component: db
+
+spec:
+  selector:
+    matchLabels:
+      project: suraj
+      env: dev
+      component: db
+  serviceName: rabbitmq
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        project: suraj
+        env: dev
+        component: db
+
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: rabbitmq
+          mountPath: /var/lib/rabbitmq
+
+      volumeClaimTemplates:
+      - metadata:
+          name: rabbitmq
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          storageClassName: "suraj-sc"
+          resources:
+            requests:
+              storage: 5Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: suraj
+
+spec:
+  clusterIP: None
+  selector:
+    project: suraj
+    component: db
+    env: dev
+  ports:
+  - name: rabbitmq
+    protocol: TCP
+    ports: 5672
+    targetPort: 5672
