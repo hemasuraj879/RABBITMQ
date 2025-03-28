@@ -61,5 +61,5 @@ spec:
   ports:
   - name: rabbitmq
     protocol: TCP
-    ports: 5672
-    targetPort: 
+    port: 5672
+    targetPort: 5672
